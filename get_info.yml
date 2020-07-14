@@ -1,7 +1,4 @@
 - hosts: localhost
-  gather_facts: false
-  vars:
-    hostname: "192.168.132.22"
   tasks:
   - name: "{{ tower_job_template_name }}"
     na_ontap_info:
@@ -12,6 +9,5 @@
       https: "{{ https }}"
       validate_certs: "{{ validate_certs }}"
     register: netapp
-   debug:
+  - debug:
       msg: "{{ netapp.ontap_info.cluster_node_info }}"
-      
