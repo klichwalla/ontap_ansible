@@ -4,10 +4,10 @@
     na_ontap_info:
       state: info
       hostname: "{{ hostname }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
       https: "{{ https }}"
-      validate_certs: "{{ validate_certs }}"
+      validate_certs: false
     register: netapp
   - debug:
       msg: "{{ netapp.ontap_info.cluster_node_info }}"
