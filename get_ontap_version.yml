@@ -10,4 +10,4 @@
       validate_certs: false
     register: netapp
   - debug:
-      msg: "{{ netapp.ontap_info.product_version }}"
+      msg: "{{ netapp.ontap_info.system_node_info.product_version }}"
