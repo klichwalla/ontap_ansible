@@ -1,3 +1,5 @@
+collections:
+  - netapp.ontap
 - hosts: localhost
   tasks:
   - name: "{{ tower_job_template_name }}"
