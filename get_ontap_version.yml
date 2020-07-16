@@ -1,6 +1,6 @@
-collections:
-  - netapp.ontap
 - hosts: localhost
+  collections:
+    - netapp.ontap
   tasks:
   - name: "{{ tower_job_template_name }}"
     na_ontap_info:
