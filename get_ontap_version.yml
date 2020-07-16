@@ -8,6 +8,8 @@
       password: "{{ netapp_password }}"
       https: "{{ https }}"
       validate_certs: false
+      gather_subset:
+        - ontap_system_version
     register: netapp
   - debug:
-      msg: "{{ netapp.ontap_info.system_node_info.product_version }}"
+      msg: "{{ netapp.ontap_info }}"
