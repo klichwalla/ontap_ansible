@@ -10,4 +10,4 @@
       validate_certs: false
     register: netapp
   - debug:
-      msg: "{{ netapp.ontap_info.cluster_node_info }}"
+      msg: "{{ netapp.ontap_info.ontap_version }}"
