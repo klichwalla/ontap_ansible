@@ -45,6 +45,7 @@
                          sort(attribute='metric.iops.total') | 
                          list |
                          first }}"
+      register: selected_aggr
   - debug:
       msg: "{{ selected_aggr }}"
 
@@ -55,5 +56,6 @@
       "{{ na_vol.ontap_info.volume_info.records }}"
     when:
       item.svm.name == "{{ svm }}"
+    register: vol_counter
   - debug:
       msg: "{{ vol_counter }}"
