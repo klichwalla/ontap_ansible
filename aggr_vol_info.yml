@@ -1,0 +1,59 @@
+- hosts: localhost
+  gather_facts: false
+  collections:
+    - netapp.ontap
+  vars:
+    vol_counter: 1
+    na_input: &na_input
+      hostname: "{{ hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      svm: "{{ svm }}"
+      https: true
+      validate_certs: false
+  tasks:
+ # - name: "{{ tower_job_template_name }}"
+  - name: Get ONTAP Aggregate Information
+    na_ontap_info:
+      gather_subset:
+        - aggregate_info
+      fields: 
+        - name
+        - node
+        - metric
+      <<: *na_input
+    register: na_aggr
+  - debug:
+      msg: "{{ na_aggr }}"
+
+  - name: Get ONTAP Volume Info
+    na_ontap_rest_info:
+      state: info
+      gather_subset:
+        - volume_info
+      fields:
+        - name
+        - svm
+      <<: *na_input
+    register: na_vol
+    - debug:
+        msg: "{{ na_vol }}"
+
+  - name: Find aggregate with lowest IOPS
+    set_fact:
+      selected_aggr: "{{ na_aggr.ontap_info.aggregate_info.records |
+                         sort(attribute='metric.iops.total') | 
+                         list |
+                         first }}"
+    - debug:
+        msg: "{{ selected_aggr }}"
+
+  - name: Get sum of volumes
+    set_fact:
+      vol_counter: "{{ vol_counter | int + 1 }}"
+    with_items:
+      "{{ na_vol.ontap_info.volume_info.records }}"
+    when:
+      item.svm.name == "{{ svm }}"
+  - debug:
+      msg: {{ "vol_counter"}}
