@@ -36,8 +36,8 @@
         - svm
       <<: *na_input
     register: na_vol
-    - debug:
-        msg: "{{ na_vol }}"
+  - debug:
+      msg: "{{ na_vol }}"
 
   - name: Find aggregate with lowest IOPS
     set_fact:
@@ -45,8 +45,8 @@
                          sort(attribute='metric.iops.total') | 
                          list |
                          first }}"
-    - debug:
-        msg: "{{ selected_aggr }}"
+  - debug:
+      msg: "{{ selected_aggr }}"
 
   - name: Get sum of volumes
     set_fact:
