@@ -45,9 +45,8 @@
                          sort(attribute='metric.iops.total') | 
                          list |
                          first }}"
-      register: selected_aggr
   - debug:
-      msg: "{{ selected_aggr }}"
+      msg: "Selected Aggregate is "
 
   - name: Get sum of volumes
     set_fact:
@@ -56,6 +55,5 @@
       "{{ na_vol.ontap_info.volume_info.records }}"
     when:
       item.svm.name == "{{ svm }}"
-    register: vol_counter
   - debug:
-      msg: "{{ vol_counter }}"
+      msg: "Volume count is "
