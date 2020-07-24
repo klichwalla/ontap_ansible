@@ -56,4 +56,4 @@
     when:
       item.svm.name == "{{ svm }}"
   - debug:
-      msg: {{ "vol_counter"}}
+      msg: "{{ vol_counter }}""
