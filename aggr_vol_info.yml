@@ -8,7 +8,6 @@
       hostname: "{{ hostname }}"
       username: "{{ netapp_username }}"
       password: "{{ netapp_password }}"
-      svm: "{{ svm }}"
       https: true
       validate_certs: false
   tasks:
