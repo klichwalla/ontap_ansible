@@ -52,8 +52,8 @@
     set_fact:
       vol_counter: "{{ vol_counter | int + 1 }}"
     with_items:
-      "{{ na_vol.ontap_info.storage/volumes.records }}"
+      "{{ na_vol.ontap_info.'storage/volumes'.records }}"
     when:
-      item.svm.name == "{{ svm }}"
+      'item.svm.name == svm'
   - debug:
       msg: "Volume count is "
