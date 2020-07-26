@@ -17,10 +17,6 @@
     na_ontap_info:
       gather_subset:
         - aggregate_info
-      query: 
-        - name
-        - node
-        - metric
       <<: *na_input
     register: na_aggr
   - debug:
@@ -31,9 +27,6 @@
       state: info
       gather_subset:
         - volume_info
-      query:
-        - name
-        - svm
       <<: *na_input
     register: na_vol
   - debug:
