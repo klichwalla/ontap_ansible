@@ -10,11 +10,11 @@
       password: "{{ netapp_password }}"
       https: true
       validate_certs: false
-      #use_rest: "Always"
+      use_rest: "Always"
   tasks:
  # - name: "{{ tower_job_template_name }}"
   - name: Get ONTAP Aggregate Information
-    na_ontap_info:
+    na_ontap_rest_info:
       gather_subset:
         - aggregate_info
       <<: *na_input
@@ -23,7 +23,7 @@
       msg: "{{ na_aggr }}"
 
   - name: Get ONTAP Volume Info
-    na_ontap_info:
+    na_ontap_rest_info:
       state: info
       gather_subset:
         - volume_info
