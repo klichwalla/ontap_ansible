@@ -16,7 +16,7 @@
   - name: Get ONTAP Aggregate Information
     na_ontap_rest_info:
       gather_subset:
-        - storage/aggregates
+        - aggregate_info
       fields: 
         - name
         - node
@@ -30,7 +30,7 @@
     na_ontap_rest_info:
       state: info
       gather_subset:
-        - storage/volumes
+        - volume_info
       fields:
         - name
         - svm
@@ -52,6 +52,6 @@
     set_fact:
       vol_counter: "{{ vol_counter | int + 1 }}"
     with_items:
-      "{{ na_vol.ontap_info.storage/volumes.records }}"
+      "{{ na_vol.ontap_info.volume_info.records }}"
 
 
