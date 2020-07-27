@@ -16,7 +16,11 @@
   - name: Get ONTAP Aggregate Information
     na_ontap_rest_info:
       gather_subset:
-        - aggregate_info
+        - storage/aggregates
+      fields: 
+        - name
+        - node
+        - metric
       <<: *na_input
     register: na_aggr
   - debug:
@@ -26,7 +30,10 @@
     na_ontap_rest_info:
       state: info
       gather_subset:
-        - volume_info
+        - storage/volumes
+      fields:
+        - name
+        - svm
       <<: *na_input
     register: na_vol
   - debug:
