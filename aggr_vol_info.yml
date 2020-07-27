@@ -55,5 +55,3 @@
       "{{ na_vol.ontap_info.storage/volumes.records }}"
     when:
       'item.svm.name == svm'
-  - debug:
-      msg: "Volume count is "
