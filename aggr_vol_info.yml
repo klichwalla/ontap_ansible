@@ -52,4 +52,5 @@
     set_fact:
       vol_counter: "{{ vol_counter | int + 1 }}"
     with_items:
-      "{{ na_vol.ontap_info.storage//volumes }}"
+      "{{ na_vol.ontap_info.[storage/volumes] }}"
+      
