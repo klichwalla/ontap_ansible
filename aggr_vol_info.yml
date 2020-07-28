@@ -49,6 +49,8 @@
 #      msg: "Selected Aggregate is "
 
   - name: Get sum of volumes
+    -debug:
+      msg: "{{ na_vol }}"
     set_fact:
       vol_counter: "{{ vol_counter | int + 1 }}"
     with_items:
