@@ -39,19 +39,21 @@
   - debug:
       msg: "{{ na_vol }}"
 
-#  - name: Find aggregate with lowest IOPS
-#    set_fact:
-#      selected_aggr: "{{ na_aggr.ontap_info.aggregate_info.records |
-#                         sort(attribute='metric.iops.total') | 
-#                         list |
-#                         first }}"
-#  - debug:
-#      msg: "Selected Aggregate is "
+  - name: Find aggregate with lowest IOPS
+    set_fact:
+      selected_aggr: "{{ na_aggrna_vol['ontap_info']['storage/aggregates']['records'] |
+                         sort(attribute='metric.iops.total') | 
+                         list |
+                         first }}"
+  - debug:
+      msg: "Selected Aggregate is "
 
   - name: Get sum of volumes
     set_fact:
       vol_counter: "{{ vol_counter | int + 1 }}"
     with_items:
       "{{ na_vol['ontap_info']['storage/volumes']['records'] }}"
-
-
+    when:
+          item.svm.name == "{{ svm }}"
+    debug:
+      msg: "Volumes is "
