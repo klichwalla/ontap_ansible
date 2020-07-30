@@ -46,7 +46,7 @@
                          list |
                          first }}"
   - debug:
-      msg: "Selected Aggregate is " selected_aggr
+      msg: "{{ Selected Aggregate is selected_aggr }}"
 
   - name: Get sum of volumes
     set_fact:
@@ -56,4 +56,4 @@
     when:
           item.svm.name == "{{ svm }}"
   - debug:
-      msg: "Volume count is " vol_counter
+      msg: "{{ Volume count is vol_counter }}"
