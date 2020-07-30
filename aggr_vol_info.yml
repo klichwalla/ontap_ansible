@@ -54,6 +54,6 @@
     with_items:
       "{{ na_vol['ontap_info']['storage/volumes']['records'] }}"
     when:
-          item.svm.name == "{{ svm }}"
+          item.svm.name == svm
   - debug:
       msg: Volume count is {{ vol_counter }}
