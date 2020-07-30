@@ -41,7 +41,7 @@
 
   - name: Find aggregate with lowest IOPS
     set_fact:
-      selected_aggr: "{{ na_aggrna_vol['ontap_info']['storage/aggregates']['records'] |
+      selected_aggr: "{{ na_aggr['ontap_info']['storage/aggregates']['records'] |
                          sort(attribute='metric.iops.total') | 
                          list |
                          first }}"
