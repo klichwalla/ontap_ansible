@@ -14,7 +14,7 @@
     na_ontap_snapmirror:
       state: present
       source_path: 'test:test_vol0'
-      destination_path: 'test:test_ls1'
+      destination_path: 'test:test_ls2'
       relationship_state: active
       relationship_type: load_sharing
       <<: *na_input
