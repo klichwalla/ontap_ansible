@@ -1,0 +1,19 @@
+- hosts: localhost
+  gather_facts: false
+  collections:
+    - netapp.ontap
+  vars:
+    na_input: &na_input
+      hostname: "{{ hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: true
+      validate_certs: false
+  tasks:
+  - name: Attempt to Update LS Mirror
+    na_ontap_snapmirror:
+      state: present
+      source_path: 'test:test_vol0'
+      destination_path: 'test:test_ls1'
+      relationship_state: active
+      <<: *na_input
