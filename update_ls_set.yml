@@ -11,10 +11,11 @@
       validate_certs: false
   tasks:
   - name: Attempt to Update LS Mirror
-    na_ontap_snapmirror:
-      state: present
-      source_path: 'test:test_vol0'
-      destination_path: 'test:test_ls2'
-      relationship_state: active
-      relationship_type: load_sharing
+    na_ontap_zapit:
       <<: *na_input
+      vserver: test
+      zapi:
+        snapmirror-update-ls-set:
+          source-location: 'test:test_vol0'
+    register: output
+  - debug: var=output
