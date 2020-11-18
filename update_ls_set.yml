@@ -7,7 +7,6 @@
       hostname: "{{ hostname }}"
       username: "{{ netapp_username }}"
       password: "{{ netapp_password }}"
-      sourcepath: "{{ sourcepath }}"
       https: true
       validate_certs: false
   tasks:
@@ -17,6 +16,6 @@
       vserver: test
       zapi:
         snapmirror-update-ls-set:
-          source-location: sourcepath
+          source-location: "{{ sourcepath }}"
     register: output
   - debug: var=output
