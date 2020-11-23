@@ -1,0 +1,20 @@
+- hosts: localhost
+  gather_facts: false
+  collections:
+    - netapp.ontap
+  vars:
+    na_input: &na_input
+      hostname: "{{ hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: true
+      validate_certs: false
+  tasks:
+  - name: Update LS SnapMirror with ONTAP Module
+    na_ontap_snapmirror:
+      state: present
+      relationship_type: load_sharing
+      source_path: test:test_vol0
+      destination_path: test:test_ls1
+      initialize: False
+      <<: *na_input
