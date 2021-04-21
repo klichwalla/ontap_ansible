@@ -1,0 +1,6 @@
+{
+	"PRI_CLU":		"cluster.domain.name",
+	"PRI_CLU_USER":		"admin",
+	"PRI_CLU_PASS":		"password",
+	"DR_SVM":			"vs_ansible_dp_test"	
+}

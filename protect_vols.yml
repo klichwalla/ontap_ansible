@@ -1,0 +1,116 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+    input: &input
+      hostname: "{{ PRI_CLU }}"
+      username: "{{ PRI_CLU_USER }}"
+      password: "{{ PRI_CLU_PASS }}"
+      https:    true
+      validate_certs: false
+      use_rest: Always
+    drinput: &drinput
+      hostname: "{{ PRI_CLU }}" # use the DR Cluster here
+      username: "{{ PRI_CLU_USER }}"
+      password: "{{ PRI_CLU_PASS }}"
+      https:    true
+      validate_certs: false
+    dest_svm:  "{{ DR_SVM }}"
+  vars_files:
+    - global.vars
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Get NetApp Volumes
+    na_ontap_info:
+      <<: *input
+      gather_subset: 
+        - volume_info 
+      query:
+        volume-attributes:
+          volume-snapshot-attributes:
+            snapshot-policy: 5-7-12_delta
+          volume-state-attributes:
+            state: online
+          volume-id-attributes:
+            type: rw
+      desired_attributes:
+        volume-attributes:
+          volume-id-attributes:
+            name:
+          volume-language-attributes:
+            language-code:
+          volume-space-attributes:
+             physical-used:
+             size:
+    register: volinfo
+  #- debug: var=volinfo 
+
+  - name: Get existing DP volumes
+    na_ontap_info:
+      <<: *drinput
+      vserver:  "{{ dest_svm }}"
+      gather_subset: 
+        - volume_info 
+      query:
+        volume-attributes:
+          volume-state-attributes:
+            state: online
+          volume-id-attributes:
+            type: dp
+      desired_attributes:
+        volume-attributes:
+          volume-id-attributes:
+            name:
+          volume-language-attributes:
+            language-code:
+          volume-space-attributes:
+             physical-used:
+             size:
+    register: dpvolinfo
+
+## this section is needed to prevent attempting the vol create again
+## this also assumes the snapmirror already is created if the dp volume exists
+## if the volume module is called with a different aggr, it will trigger a vol move
+## and we want to avoid that
+
+  - name: Create a fact of the volumes to replicate
+    set_fact: 
+      replvols: "{{ replvols | default([]) + [ 'dp_' + item.value.volume_id_attributes.name ] }}"
+    loop: "{{ lookup('dict', volinfo.ontap_info.volume_info, wantList=True) }}"
+  - debug: var=replvols
+
+  - name: Create a fact listing the existing dp volumes
+    set_fact:
+      existingdpvols: "{{ existingdpvols | default([]) + [ item.value.volume_id_attributes.name ] }}"
+    loop: "{{ lookup('dict', dpvolinfo.ontap_info.volume_info, wantlist=True) }}"
+  - debug: var=existingdpvols
+
+  - name: Define vols which are not already being replicated
+    set_fact:
+      newdpvols: "{{ newdpvols | default([]) + [ item[3:] ] }}" # [3:] get all but first 3 chars
+    loop: "{{ replvols }}"
+    when: item not in existingdpvols
+  - debug: var=newdpvols
+
+  - name: Create DP Volume on hdd aggr with most free space
+    include_tasks: aggr_largest_freespace.yml
+    vars:
+      <<: *drinput
+      vserver: "{{ dest_svm }}"
+      currvol: "{{ item }}"
+    with_list: "{{ volinfo.ontap_info.volume_info |default([]) | dict2items }}"
+    when: item.value.volume_id_attributes.name in newdpvols and newdpvols is defined
+    
+  - name: Create and Initialize SnapMirror
+    na_ontap_snapmirror:
+      <<: *drinput
+      state: present
+      source_path: "{{ item.value.volume_id_attributes.owning_vserver_name }}:{{ item.value.volume_id_attributes.name }}"
+      destination_path: "{{ dest_svm }}:dp_{{ item.value.volume_id_attributes.name }}"
+      relationship_type: extended_data_protection
+      schedule: hourly
+      policy: MirrorAllSnapshots
+      initialize: True
+    loop: "{{ volinfo.ontap_info.volume_info |default([]) | dict2items }}"
+    when: item.value.volume_id_attributes.name in newdpvols and newdpvols is defined

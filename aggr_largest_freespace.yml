@@ -1,0 +1,45 @@
+---
+  - name: Find hdd aggr with most free space for DP Volume
+    na_ontap_info:
+      hostname: "{{ hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      https:    "{{ true }}"
+      validate_certs: "{{ validate_certs }}"
+      gather_subset: 
+        - aggregate_info
+      query:
+        aggr-attributes:
+          aggr-raid-attributes:
+            is-root-aggregate: "false"
+          aggr-space-attributes:
+            size-available: ">{{ currvol.value.volume_space_attributes.size | int}}"
+            #size-available: ">1579167744"
+    register: aggrinfo
+  #- debug:
+  #    msg: "{{ currvol.value.volume_space_attributes.physical_used | int }} {{ currvol.key }}"
+      #msg: "{{ aggrinfo }}"
+  - set_fact:
+      aggr_name: "{{ aggrinfo.ontap_info.aggregate_info | sort(attribute='aggr_space_attributes.size_available' | int) | last}}" #dict2items |
+  #- debug:
+  #    msg: "{{ aggr_name }}"
+  
+  - name: Create DP Volume
+    na_ontap_volume:
+      hostname: "{{ hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      https:    "{{ true }}"
+      validate_certs: "{{ validate_certs }}"
+      #use_rest: Never
+      state: present
+      name: "dp_{{ currvol.value.volume_id_attributes.name }}"
+      is_infinite: False
+      aggregate_name: "{{ aggr_name }}"
+      language: "{{ currvol.value.volume_language_attributes.language_code }}"
+      size: "{{ currvol.value.volume_space_attributes.size| int }}" 
+      size_unit: b
+      space_guarantee: none
+      type: DP
+      vserver: "{{ vserver }}"
+      wait_for_completion: True
