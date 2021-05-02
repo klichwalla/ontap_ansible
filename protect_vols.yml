@@ -94,21 +94,33 @@
   - name: Create a fact listing the existing dp volumes
     set_fact:
       existingdpvols: "{{ existingdpvols | default([]) + [ item.value.volume_id_attributes.name ] }}"
-    loop: "{{ q('dict', dpvolinfo.ontap_info.volume_info) | default([]) }}"
+    loop: "{{ q('dict', dpvolinfo.ontap_info.volume_info |  ternary(dpvolinfo.ontap_info.volume_info, {})) }}"
+    when: dpvolinfo.ontap_info.volume_info | default(False)
   - debug: 
       msg:
         - "Existing replicated volumes includes:"
         - "{{ existingdpvols | default ([])}}"
 
-  - name: Define vols which are not already being replicated
+  - name: Define vols which are not already being replicated if existing DP vols exist
     set_fact:
       newdpvols: "{{ newdpvols | default([]) + [ item[3:] ] }}" # [3:] get all but first 3 chars
     loop: "{{ replvols | default([]) }}"
-    when: item not in existingdpvols
+    when: item not in existingdpvols and existingdpvols is defined
   - debug: 
       msg:
         - "Volumes we need to add replication for are:"
         - "{{ newdpvols | default([]) }}"
+
+  # this is needed as the compare above is done only if existing dp volumes exist
+  - name: Define new DP vols if no existing DP volumes exist
+    set_fact:
+      newdpvols: "{{ newdpvols | default([]) + [ item[3:] ] }}" # [3:] get all but first 3 chars
+    loop: "{{ replvols | default([]) }}"
+    when: dpvolinfo.ontap_info.volume_info == None
+  - debug: 
+      msg:
+        - "Volumes we need to add replication for are:"
+        - "{{ newdpvols | default([]) }}"        
 
   - name: Create DP Volume on hdd aggr with most free space
     include_tasks: aggr_largest_freespace.yml
