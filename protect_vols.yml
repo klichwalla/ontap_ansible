@@ -84,8 +84,7 @@
   - name: Create a fact of the volumes to replicate
     set_fact: 
       replvols: "{{ replvols | default([]) + [ 'dp_' + item.value.volume_id_attributes.name ] }}"
-    loop: "{{ q('dict', volinfo.ontap_info.volume_info) | default([]) }}"
-    when: 
+    loop: "{{ q('dict', volinfo.ontap_info.volume_info | ternary(volinfo.ontap_info.volume_info, {})) }}"
   - debug: 
       msg:
         - "Volumes to replicate includes:"
@@ -95,7 +94,6 @@
     set_fact:
       existingdpvols: "{{ existingdpvols | default([]) + [ item.value.volume_id_attributes.name ] }}"
     loop: "{{ q('dict', dpvolinfo.ontap_info.volume_info |  ternary(dpvolinfo.ontap_info.volume_info, {})) }}"
-    when: dpvolinfo.ontap_info.volume_info | default(False)
   - debug: 
       msg:
         - "Existing replicated volumes includes:"
@@ -128,7 +126,7 @@
       <<: *drinput
       vserver: "{{ dest_svm }}"
       currvol: "{{ item }}"
-    with_list: "{{ volinfo.ontap_info.volume_info |default([]) | dict2items }}"
+    with_list: "{{ (volinfo.ontap_info.volume_info | ternary(volinfo.ontap_info.volume_info, {})) | dict2items }}"
     when: item.value.volume_id_attributes.name in newdpvols and newdpvols is defined
     
   - name: Create and Initialize SnapMirror
@@ -141,5 +139,5 @@
       schedule: hourly
       policy: MirrorAllSnapshots
       initialize: True
-    loop: "{{ volinfo.ontap_info.volume_info |default([]) | dict2items }}"
+    loop: "{{ (volinfo.ontap_info.volume_info | ternary(volinfo.ontap_info.volume_info, {})) | dict2items }}"
     when: item.value.volume_id_attributes.name in newdpvols and newdpvols is defined
