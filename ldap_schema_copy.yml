@@ -14,7 +14,7 @@
   - name: Copy LDAP Schema
     na_ontap_command:
       <<: *na_input
-      command: ['ldap','client','schema','copy','-schema','RFC-2307','-new-schema-name','custom-ldap','-vserver','{{ vserver }}']
+      command: ['ldap', 'client', 'schema', 'copy', '-schema', 'RFC-2307', '-new-schema-name', 'custom-ldap','-vserver','{{ vserver }}']
       privilege: 'advanced'
       return_dict: true
       vserver: "{{ cluster }}"
