@@ -1,0 +1,23 @@
+- hosts: localhost
+  gather_facts: false
+  collections:
+    - netapp.ontap
+  vars:
+    na_input: &na_input
+      hostname: "{{ cluster }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      vserver: "{{ vserver }}"
+      https: true
+      validate_certs: false
+  tasks:
+  - name: Copy LDAP Schema
+    na_ontap_command:
+      <<: *na_input
+      command: ['ldap','client','schema','copy','-schema','RFC-2307','-new-schema-name','custom-ldap','-vserver','{{ vserver }}']
+      privilege: 'advanced'
+      return_dict: true
+      vserver: "{{ cluster }}"
+    register: result
+  - debug:
+      msg: "{{ result }}"
