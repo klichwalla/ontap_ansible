@@ -17,5 +17,5 @@
       package_url: "{{ url }}"
       package_version: "{{ version_name }}"
       ignore_validation_warning: True
-      register: output
+    register: output
   - debug: var=output  
