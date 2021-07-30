@@ -1,3 +1,8 @@
+---
+# Match snapshot policy on primary, verify snapmirror relationship exists,
+# if not, provision DP volume on aggr with largest free space, and create
+# and initialize snapmirror relationship
+# 
 - hosts: localhost
   gather_facts: false
   vars:
@@ -14,7 +19,9 @@
       password: "{{ PRI_CLU_PASS }}"
       https:    true
       validate_certs: false
-    dest_svm:  "{{ DR_SVM }}"
+    src_svm: "{{ PRI_SVM }}"    # The source SVM where the primary volume resides
+    dest_svm:  "{{ DR_SVM }}"   # the target SVM for replication
+    dp_prefix: "{{ src_svm }}_" # this prefix will be added to the source volume name when vol created on the DR SVM
   vars_files:
     - global.vars
   collections:
@@ -24,6 +31,7 @@
   - name: Get NetApp Volumes
     na_ontap_info:
       <<: *input
+      vserver:  "{{ src_svm }}"
       gather_subset: 
         - volume_info 
       query:
@@ -50,31 +58,28 @@
         - "{{ volinfo }}"
 
 
-  - name: Get existing DP volumes
+  - name: Get SnapMirror Destinations
     na_ontap_info:
-      <<: *drinput
-      vserver:  "{{ dest_svm }}"
-      gather_subset: 
-        - volume_info 
+      <<: *input
+      vserver: "{{ src_svm }}"
+      gather_subset:
+        - snapmirror_destination_info
       query:
-        volume-attributes:
-          volume-state-attributes:
-            state: online
-          volume-id-attributes:
-            type: dp
+        snapmirror-destination-info:
+          destination-vserver: "{{ dest_svm }}"
+          source-vserver: "{{ src_svm }}"
       desired_attributes:
-        volume-attributes:
-          volume-id-attributes:
-            name:
-          volume-language-attributes:
-            language-code:
-          volume-space-attributes:
-             physical-used:
-             size:
+        snapmirror-destination-info:
+          destination-location:
+          destination-vserver:
+          destination-volume:
+          source-location:
+          source-vserver:
+          source-volume:
     register: dpvolinfo
   - debug:
-      msg:
-        - "Collected DP volume information from destination SVM"
+      msg: 
+        - "Snapmirror destination information"
         - "{{ dpvolinfo }}"
 
 ## this section is needed to prevent attempting the vol create again
@@ -83,7 +88,7 @@
 
   - name: Create a fact of the volumes to replicate
     set_fact: 
-      replvols: "{{ replvols | default([]) + [ 'dp_' + item.value.volume_id_attributes.name ] }}"
+      replvols: "{{ replvols | default([]) + [ item.value.volume_id_attributes.name ] }}"
     loop: "{{ q('dict', volinfo.ontap_info.volume_info | ternary(volinfo.ontap_info.volume_info, {})) }}"
   - debug: 
       msg:
@@ -92,8 +97,8 @@
 
   - name: Create a fact listing the existing dp volumes
     set_fact:
-      existingdpvols: "{{ existingdpvols | default([]) + [ item.value.volume_id_attributes.name ] }}"
-    loop: "{{ q('dict', dpvolinfo.ontap_info.volume_info |  ternary(dpvolinfo.ontap_info.volume_info, {})) }}"
+      existingdpvols: "{{ existingdpvols | default([]) + [ item.value.source_volume ] }}"
+    loop: "{{ q('dict', dpvolinfo.ontap_info.snapmirror_destination_info |  ternary(dpvolinfo.ontap_info.snapmirror_destination_info, {})) }}" #u se source volume here to simplify matching
   - debug: 
       msg:
         - "Existing replicated volumes includes:"
@@ -101,7 +106,7 @@
 
   - name: Define vols which are not already being replicated if existing DP vols exist
     set_fact:
-      newdpvols: "{{ newdpvols | default([]) + [ item[3:] ] }}" # [3:] get all but first 3 chars
+      newdpvols: "{{ newdpvols | default([]) + [ item ] }}" # add item to the list
     loop: "{{ replvols | default([]) }}"
     when: item not in existingdpvols and existingdpvols is defined
   - debug: 
@@ -112,9 +117,9 @@
   # this is needed as the compare above is done only if existing dp volumes exist
   - name: Define new DP vols if no existing DP volumes exist
     set_fact:
-      newdpvols: "{{ newdpvols | default([]) + [ item[3:] ] }}" # [3:] get all but first 3 chars
+      newdpvols: "{{ newdpvols | default([]) + [ item ] }}" # add item to the list
     loop: "{{ replvols | default([]) }}"
-    when: dpvolinfo.ontap_info.volume_info == None
+    when: dpvolinfo.ontap_info.snapmirror_destination_info == None
   - debug: 
       msg:
         - "Volumes we need to add replication for are:"
@@ -126,6 +131,7 @@
       <<: *drinput
       vserver: "{{ dest_svm }}"
       currvol: "{{ item }}"
+      dpprefix: "{{ dp_prefix }}"
     with_list: "{{ (volinfo.ontap_info.volume_info | ternary(volinfo.ontap_info.volume_info, {})) | dict2items }}"
     when: item.value.volume_id_attributes.name in newdpvols and newdpvols is defined
     
@@ -133,8 +139,10 @@
     na_ontap_snapmirror:
       <<: *drinput
       state: present
-      source_path: "{{ item.value.volume_id_attributes.owning_vserver_name }}:{{ item.value.volume_id_attributes.name }}"
-      destination_path: "{{ dest_svm }}:dp_{{ item.value.volume_id_attributes.name }}"
+      source_endpoint:
+        path: "{{ item.value.volume_id_attributes.owning_vserver_name }}:{{ item.value.volume_id_attributes.name }}"
+      destination_endpoint: 
+        path: "{{ dest_svm }}:{{ dp_prefix}}{{ item.value.volume_id_attributes.name }}"
       relationship_type: extended_data_protection
       schedule: hourly
       policy: MirrorAllSnapshots
