@@ -33,7 +33,7 @@
       validate_certs: "{{ validate_certs }}"
       #use_rest: Never
       state: present
-      name: "dp_{{ currvol.value.volume_id_attributes.name }}"
+      name: "{{ dpprefix }}{{ currvol.value.volume_id_attributes.name }}"
       is_infinite: False
       aggregate_name: "{{ aggr_name }}"
       language: "{{ currvol.value.volume_language_attributes.language_code }}"
