@@ -14,8 +14,9 @@
     na_ontap_software_update:
       <<: *na_input
       state: present
-      package_url: "{{ url }}"
+      package_url: "{{ package_url }}"
       package_version: "{{ version_name }}"
       ignore_validation_warning: True
+      download_only: True
     register: output
   - debug: var=output  
