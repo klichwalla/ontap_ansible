@@ -18,5 +18,6 @@
       package_version: "{{ version_name }}"
       ignore_validation_warning: True
       download_only: "{{ download_only }}"
+      timeout: 7200
     register: output
   - debug: var=output  
