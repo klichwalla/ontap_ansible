@@ -11,7 +11,7 @@
       validate_certs: false
       use_rest: "Always"
   tasks:
-  - name: Create FlexVol
+  - name: Resize FlexVol
     na_ontap_volume:
       state: present
       name: "{{ volname }}"
