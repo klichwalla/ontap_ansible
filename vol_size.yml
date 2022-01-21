@@ -16,5 +16,6 @@
       state: present
       name: "{{ volname }}"
       size: "{{ size }}"
+      vserver: "{{ vserver }}"
       size_unit: mb
       <<: *na_input
