@@ -1,0 +1,19 @@
+- hosts: localhost
+  gather_facts: false
+  collections:
+    - netapp.ontap
+  vars:
+    na_input: &na_input
+      hostname: "{{ hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: true
+      validate_certs: false
+      use_rest: "Always"
+  tasks:
+  - name: Delete FlexVol
+    na_ontap_volume:
+      state: absent
+      name: "{{ volname }}"
+      vserver: "{{ vserver }}"
+      <<: *na_input
