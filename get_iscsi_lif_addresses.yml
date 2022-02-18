@@ -10,17 +10,17 @@
       https:    true
       validate_certs: false
       use_rest: Always
-      # svm: "{{ svm }}"    # The source SVM where the primary volume resides
+      svm: "{{ svm }}"    # The source SVM where the primary volume resides
   collections:
     - netapp.ontap
 
   tasks:
   - name: Get iSCSI Interface Addresses
-    na_ontap_rest_info:
+    na_ontap_info:  # na_ontap_rest_info only returned the URL to the interface details, not the actual details
       <<: *input
-      # vserver:  "{{ svm }}"
+      vserver:  "{{ svm }}"
       gather_subset: 
-        - ip_interfaces_info
+        - net_interface_info
     register: iscsi_interfaces
   - debug:
       msg: 
