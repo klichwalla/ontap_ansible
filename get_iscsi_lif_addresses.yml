@@ -21,13 +21,15 @@
       vserver:  "{{ svm }}"
       gather_subset: 
         - net_interface_info
-      #query:
-      #  data-protocols:
-      #    data-protocol: iscsi
+      query:
+        net-interface-info:
+          data-protocols:
+            data-protocol: iscsi
       desired_attributes:
-        address:
-        data-protocols:
-          data-protocol:
+        net-interface-info
+          address:
+          data-protocols:
+            data-protocol:
     register: iscsi_interfaces
   - debug:
       msg: 
