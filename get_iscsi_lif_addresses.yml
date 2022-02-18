@@ -26,7 +26,7 @@
           data-protocol: iscsi
         administrative-status: up
         operational-status: up
-      desired_attributers:
+      desired_attributes:
         address:
     register: iscsi_interfaces
   - debug:
