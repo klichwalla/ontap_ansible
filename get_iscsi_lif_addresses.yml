@@ -1,0 +1,27 @@
+---
+# Query SVM for iSCSI LIF Interface Addresses
+- hosts: localhost
+  gather_facts: false
+  vars:
+    input: &input
+      hostname: "{{ hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https:    true
+      validate_certs: false
+      use_rest: Always
+      svm: "{{ svm }}"    # The source SVM where the primary volume resides
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Get iSCSI Interface Addresses
+    na_ontap_rest_info:
+      <<: *input
+      vserver:  "{{ svm }}"
+      gather_subset: 
+        - ip_interfaces_info
+    register: iscsi_interfaces
+  - debug:
+      msg: 
+        - "{{ iscsi_interfaces }}"
