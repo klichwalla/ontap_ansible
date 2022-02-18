@@ -10,7 +10,7 @@
       https:    true
       validate_certs: false
       use_rest: Always
-      svm: "{{ svm }}"    # The source SVM where the primary volume resides
+      # svm: "{{ svm }}"    # The source SVM where the primary volume resides
   collections:
     - netapp.ontap
 
