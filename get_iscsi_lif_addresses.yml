@@ -18,7 +18,7 @@
   - name: Get iSCSI Interface Addresses
     na_ontap_rest_info:
       <<: *input
-      vserver:  "{{ svm }}"
+      # vserver:  "{{ svm }}"
       gather_subset: 
         - ip_interfaces_info
     register: iscsi_interfaces
