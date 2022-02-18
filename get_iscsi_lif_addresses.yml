@@ -24,10 +24,6 @@
       query:
         data-protocols:
           data-protocol: iscsi
-        administrative-status: up
-        operational-status: up
-      desired_attributes:
-        address:
     register: iscsi_interfaces
   - debug:
       msg: 
