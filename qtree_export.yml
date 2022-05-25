@@ -1,0 +1,36 @@
+- hosts: localhost
+  gather_facts: false
+  collections:
+    - netapp.ontap
+  vars:
+    na_input: &na_input
+      hostname: "{{ hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: true
+      validate_certs: false
+      use_rest: "Always"
+  tasks:
+  - name: Create Qtree
+    na_ontap_qtree:
+      state: present
+      name: testqtree
+      flexvol_name: qtreetest
+      export_policy: qtreetestpolicy
+      security_style: ntfs
+      oplocks: disabled
+      unix_permissions:
+      vserver: storage2
+      <<: *na_input
+      
+  - name: Create Qtree Export Policy
+    na_ontap_qtree:
+      state: present
+      name: testqtree
+      flexvol_name: qtreetest
+      export_policy: qtreetestpolicyclone
+      security_style: ntfs
+      oplocks: disabled
+      unix_permissions:
+      vserver: storage2
+      <<: *na_input
