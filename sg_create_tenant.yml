@@ -32,7 +32,7 @@
       msg: "{{ auth }}"
   
   - name: Get existing tenant list
-    uri:
+    ansible.builtin.uri:
       url: "{{ storagegrid_url }}/api/v3/grid/accounts?limit=1000"
       headers:
         Authorization: "{{ auth.json.data }}"
@@ -71,8 +71,8 @@
   -debug:
       msg: "{{ tenant_id }}"
   
-  -name: Get the tenant authorization token
-    uri: 
+  - name: Get the tenant authorization token
+    ansible.builtin.uri: 
       url: "{{storagegrid_url}}/api/v3/authorize"
       method: POST
         body: {
@@ -82,8 +82,8 @@
           "cookie": false,
           "csrfToken": false
         }
-        body_format: json
-        validate_certs: false
+      body_format: json
+      validate_certs: false
     register: tenant_auth
     no_log: false
   - debug:
