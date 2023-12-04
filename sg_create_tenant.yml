@@ -13,7 +13,7 @@
 
   tasks:
   - name: Get StorageGrid admin auth token
-    url:
+    ansible.builtin.uri:
       url: "{{storagegrid_url}}/api/v3/authorize"
       method: POST
       body: {
