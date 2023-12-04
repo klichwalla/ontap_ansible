@@ -70,7 +70,7 @@
       tenant_id: "{{ acctnew | json_query('resp.id') }}"
   -debug:
       msg: "{{ tenant_id }}"
-  
+
   - name: Get the tenant authorization token
     ansible.builtin.uri: 
       url: "{{storagegrid_url}}/api/v3/authorize"
