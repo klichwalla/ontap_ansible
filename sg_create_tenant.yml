@@ -10,6 +10,8 @@
     tenant_username: root
     full_tenant_name: "{{env}}-{{tenant_name}}"
     owner_ad_group: "{{owner_ad_group}"
+    storagegrid_url: "{{storagegrid_url}}"
+    tenant_password" "{{tenant_password}}"
 
   tasks:
   - name: Get StorageGrid admin auth token
@@ -39,7 +41,7 @@
       validate_certs: false
     register: acctchk
   - debug:
-      msg: {acctchk}
+      msg: "{{acctchk}}"
   
   - name: Check if tenant account already exists
     set_fact: acctexist=true
