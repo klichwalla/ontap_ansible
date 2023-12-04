@@ -71,17 +71,17 @@
   -debug:
       msg: "{{ tenant_id }}"
 
-  - name: Get the tenant authorization token
-    ansible.builtin.uri: 
-      url: "{{storagegrid_url}}/api/v3/authorize"
+  - name: Authenticate to the tenant ID just created
+    ansible.builtin.uri:
+      url: "{{ storagegrid_url }}/api/v3/authorize"
       method: POST
-        body: {
-          "username": "{{ tenant_username }}",
-          "password": "{{ tenant_password }}",
-          "accountId": "{{ tenant_id }}",
-          "cookie": false,
-          "csrfToken": false
-        }
+      body: {
+        "username": "{{ tenant_username }}",
+        "password": "{{ tenant_password }}",
+        "accountId": "{{ tenant_id }}",
+        "cookie": false,
+        "csrfToken": false
+      }
       body_format: json
       validate_certs: false
     register: tenant_auth
