@@ -89,4 +89,16 @@
   - debug:
       msg: "{{ tenant_auth }}"
   
-
+  - name: Create the delegated admin group on the tenant
+    netapp.storagegrid.na_sg_org_group:
+      api_url: "{{ storagegrid_url }}"
+      auth_token: "{{ tenant_auth.json.data }}"
+      validate_certs: false
+      state: present
+      unique_name: "federated-group/{{ owner_ad_group }}"
+      management_policy:
+        manage_all_containers: true
+        manage_endpoints: true
+        manage_own_s3_credentials: true
+        root_access: false
+    no_log: false
