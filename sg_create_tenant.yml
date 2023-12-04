@@ -8,19 +8,19 @@
   # variables
   vars:
     tenant_username: root
-    full_tenant_name: "{{env}}-{{tenant_name}}"
-    owner_ad_group: "{{owner_ad_group}"
-    storagegrid_url: "{{storagegrid_url}}"
-    tenant_password: "{{tenant_password}}"
+    full_tenant_name: "{{ env }}-{{ tenant_name }}"
+    owner_ad_group: "{{ owner_ad_group}"
+    storagegrid_url: "{{ storagegrid_url }}"
+    tenant_password: "{{ tenant_password }}"
 
   tasks:
   - name: Get StorageGrid admin auth token
     ansible.builtin.uri:
-      url: "{{storagegrid_url}}/api/v3/authorize"
+      url: "{{ storagegrid_url }}/api/v3/authorize"
       method: POST
       body: {
-        "username": "{{sg_username}}",
-        "password": "{{sg_password}}",
+        "username": "{{ sg_username }}",
+        "password": "{{ sg_password }}",
         "cookie": false,
         "csrfToken": false
       }
@@ -33,33 +33,33 @@
   
   - name: Get existing tenant list
     uri:
-      url: "{{storagegrid_url}}/api/v3/grid/accounts?limit=1000"
+      url: "{{ storagegrid_url }}/api/v3/grid/accounts?limit=1000"
       headers:
-        Authorization: "{{auth.json.data}}"
+        Authorization: "{{ auth.json.data }}"
       method: GET
       body_format: json
       validate_certs: false
     register: acctchk
   - debug:
-      msg: "{{acctchk}}"
+      msg: "{{ acctchk }}"
   
   - name: Check if tenant account already exists
     set_fact: acctexist=true
     when: item.name==full_tenant_name
-    with_items: "{{acctchk.json.data}}"
+    with_items: "{{ acctchk.json.data }}"
 
   - name: Create tenant account
     netapp.storagegrid.na_sg_grid_account:
-      api_url: "{{storagegrid_url}}"
-      auth_token: "{{auth.json.data}}"
+      api_url: "{{ storagegrid_url }}"
+      auth_token: "{{ auth.json.data }}"
       validate_certs: false
       state: present
-      name: "{{fill_tenant_name}}"
+      name: "{{ fill_tenant_name }}"
       protocol: s3
       management: true
       use_own_identity_source: false
       allow_platform_services: false
-      password: "{{tenant_password}}"
+      password: "{{ tenant_password }}"
       root_access_group: "federated-group/Domain Admins"
     no_log: false
     register: acctnew
