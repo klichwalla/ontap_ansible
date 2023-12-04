@@ -24,42 +24,42 @@
       }
       body_format: json
       validate_certs: false
-  register: auth
-  no_log: false
+    register: auth
+    no_log: false
   - debug:
       msg: "{{ auth }}"
   
-- name: Get existing tenant list
-  uri:
-    url: "{{storagegrid_url}}/api/v3/grid/accounts?limit=1000"
-    headers:
-      Authorization: "{{auth.json.data}}"
-    method: GET
-    body_format: json
-    validate_certs: false
-  register: acctchk
-- debug:
-    msg: {acctchk}
- 
-- name: Check if tenant account already exists
-  set_fact: acctexist=true
-  when: item.name==full_tenant_name
-  with_items: "{{acctchk.json.data}}"
+  - name: Get existing tenant list
+    uri:
+      url: "{{storagegrid_url}}/api/v3/grid/accounts?limit=1000"
+      headers:
+        Authorization: "{{auth.json.data}}"
+      method: GET
+      body_format: json
+      validate_certs: false
+    register: acctchk
+  - debug:
+      msg: {acctchk}
+  
+  - name: Check if tenant account already exists
+    set_fact: acctexist=true
+    when: item.name==full_tenant_name
+    with_items: "{{acctchk.json.data}}"
 
-- name: Create tenant account
-  netapp.storagegrid.na_sg_grid_account:
-    api_url: "{{storagegrid_url}}"
-    auth_token: "{{auth.json.data}}"
-    validate_certs: false
-    state: present
-    name: "{{fill_tenant_name}}"
-    protocol: s3
-    management: true
-    use_own_identity_source: false
-    allow_platform_services: false
-    password: "{{tenant_password}}"
-    root_access_group: "federated-group/Domain Admins"
-  no_log: false
-  register: acctnew
-  when: acctexist is undefined
+  - name: Create tenant account
+    netapp.storagegrid.na_sg_grid_account:
+      api_url: "{{storagegrid_url}}"
+      auth_token: "{{auth.json.data}}"
+      validate_certs: false
+      state: present
+      name: "{{fill_tenant_name}}"
+      protocol: s3
+      management: true
+      use_own_identity_source: false
+      allow_platform_services: false
+      password: "{{tenant_password}}"
+      root_access_group: "federated-group/Domain Admins"
+    no_log: false
+    register: acctnew
+    when: acctexist is undefined
 
