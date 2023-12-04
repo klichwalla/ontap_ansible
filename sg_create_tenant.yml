@@ -102,3 +102,7 @@
         manage_own_s3_credentials: true
         root_access: false
     no_log: false
+    register: tenant_admin_group_add
+    retries: 40  # 10 min with 40 retries at 15 sec intervals 
+    delay: 15
+    until: result is not failed
