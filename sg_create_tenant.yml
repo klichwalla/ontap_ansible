@@ -65,3 +65,27 @@
     register: acctnew
     when: acctexist is undefined
 
+  - name: Get the tenant ID just created
+    set_fact:
+      tenant_id: "{{ acctnew | json_query('resp.id') }}"
+  -debug:
+      msg: "{{ tenant_id }}"
+  
+  -name: Get the tenant authorization token
+    ansible.builtin.uri: "{{storagegrid_url}}/api/v3/authorize"
+    method: POST
+      body: {
+        "username": "{{ tenant_username }}",
+        "password": "{{ tenant_password }}",
+        "accountId": "{{ tenant_id }}"
+        "cookie": false,
+        "csrfToken": false
+      }
+      body_format: json
+      validate_certs: false
+    register: tenant_auth
+    no_log: false
+  - debug:
+      msg: "{{ tenant_auth }}"
+  
+
