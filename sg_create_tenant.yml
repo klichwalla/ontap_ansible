@@ -11,7 +11,7 @@
     full_tenant_name: "{{env}}-{{tenant_name}}"
     owner_ad_group: "{{owner_ad_group}"
     storagegrid_url: "{{storagegrid_url}}"
-    tenant_password" "{{tenant_password}}"
+    tenant_password: "{{tenant_password}}"
 
   tasks:
   - name: Get StorageGrid admin auth token
