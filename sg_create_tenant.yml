@@ -10,7 +10,7 @@
     tenant_username: root
     full_tenant_name: "{{ env }}-{{ tenant_name }}"
     owner_ad_group: "{{ owner_ad_group}"
-    storagegrid_url: "{{ storagegrid_url }}"
+    storagegrid_url: "{{ storagegrid_base_url }}"
     tenant_password: "{{ tenant_password }}"
 
   tasks:
