@@ -9,7 +9,7 @@
   vars:
     tenant_username: root
     full_tenant_name: "{{ env }}-{{ tenant_name }}"
-    owner_ad_group: "{{ owner_ad_group}"
+    owner_ad_group: "{{ owner_ad_group }}"
     storagegrid_url: "{{ storagegrid_base_url }}"
     tenant_password: "{{ tenant_password }}"
 
@@ -54,7 +54,7 @@
       auth_token: "{{ auth.json.data }}"
       validate_certs: false
       state: present
-      name: "{{ fill_tenant_name }}"
+      name: "{{ full_tenant_name }}"
       protocol: s3
       management: true
       use_own_identity_source: false
