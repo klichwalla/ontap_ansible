@@ -78,7 +78,7 @@
         body: {
           "username": "{{ tenant_username }}",
           "password": "{{ tenant_password }}",
-          "accountId": "{{ tenant_id }}"
+          "accountId": "{{ tenant_id }}",
           "cookie": false,
           "csrfToken": false
         }
