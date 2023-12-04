@@ -105,4 +105,4 @@
     register: tenant_admin_group_add
     retries: 40  # 10 min with 40 retries at 15 sec intervals 
     delay: 15
-    until: result is not failed
+    until: tenant_admin_group_add is not failed
