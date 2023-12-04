@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  collections:
+    - netapp.storagegrid
+  gather_facts: false
+  remote_user: root
+
+  # variables
+  vars:
+    tenant_username: root
+    full_tenant_name: "{{env}}-{{tenant_name}}"
+    owner_ad_group: "{{owner_ad_group}"
+
+  tasks:
+  - name: Get StorageGrid admin auth token
+    url:
+      url: "{{storagegrid_url}}"/api/v3/authorize"
+      method: POST
+      body: {
+        "username": "{{sg_username}}",
+        "password": "{{sg_password}}",
+        "cookie": false,
+        "csrfToken": false
+      }
+      body_format: json
+      validate_certs: false
+  register: auth
+  no_log: false
+  - debug:
+      msg: "{{ auth }}"
+  
