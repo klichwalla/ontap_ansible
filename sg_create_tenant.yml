@@ -58,7 +58,7 @@
     use_own_identity_source: false
     allow_platform_services: false
     password: "{{tenant_password}}"
-    root_access_group: "federated-group/Domain Administrators"
+    root_access_group: "federated-group/Domain Admins"
   no_log: false
   register: acctnew
   when: acctexist is undefined
