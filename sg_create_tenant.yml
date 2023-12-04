@@ -68,7 +68,7 @@
   - name: Get the tenant ID just created
     set_fact:
       tenant_id: "{{ acctnew | json_query('resp.id') }}"
-  -debug:
+  - debug:
       msg: "{{ tenant_id }}"
 
   - name: Authenticate to the tenant ID just created
