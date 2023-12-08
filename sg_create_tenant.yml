@@ -59,7 +59,6 @@
       body: {
         "name": "{{ full_tenant_name }}",
         "description": "my tenant description",
-        "protocol": "s3",
         "capabilities" : [ 
           "management", 
           "s3" 
