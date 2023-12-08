@@ -51,18 +51,39 @@
     with_items: "{{ acctchk.json.data }}"
 
   - name: Create tenant account
-    netapp.storagegrid.na_sg_grid_account:
-      api_url: "{{ storagegrid_url }}"
-      auth_token: "{{ auth.json.data }}"
+#    netapp.storagegrid.na_sg_grid_account:
+#      api_url: "{{ storagegrid_url }}"
+#      auth_token: "{{ auth.json.data }}"
+#      validate_certs: false
+#      state: present
+#      name: "{{ full_tenant_name }}"
+#      protocol: s3
+#      management: true
+#      use_own_identity_source: false
+#      allow_platform_services: false
+#      password: "{{ tenant_password }}"
+#      root_access_group: "federated-group/Domain Admins"
+##  using REST instead so we can define the description
+    ansible.builtin.uri:
+      url: "{{ storagegrid_url }}/api/v3/grid/accounts?limit=1000"
+      headers:
+        Authorization: "{{ auth.json.data }}"
+      method: POST
+      body: {
+        "name": "{{ full_tenant_name }}",
+        "description": "my tenant description",
+        "protocol": "s3",
+        "capabilities" : [ "management", "s3" ],
+        "policy": {
+          "useAccountIdentitySource": false,
+          "allowPlatformServices": false
+        }
+        "password": "{{ tenant_password }}",
+        "grantRootAccessToGroup": "federated-group/Domain Admins"
+      }
+      status_code: 201 # successful create is a 201 code
+      body_format: json
       validate_certs: false
-      state: present
-      name: "{{ full_tenant_name }}"
-      protocol: s3
-      management: true
-      use_own_identity_source: false
-      allow_platform_services: false
-      password: "{{ tenant_password }}"
-      root_access_group: "federated-group/Domain Admins"
     no_log: false
     register: acctnew
     when: acctexist is undefined
