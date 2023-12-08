@@ -67,7 +67,7 @@
         "policy": {
           "useAccountIdentitySource": false,
           "allowPlatformServices": false
-        }
+        },
         "password": "{{ tenant_password }}",
         "grantRootAccessToGroup": "federated-group/Domain Admins"
       }
