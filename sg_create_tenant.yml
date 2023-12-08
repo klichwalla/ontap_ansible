@@ -49,8 +49,6 @@
       tenant_id: item.id
     when: item.name==full_tenant_name
     with_items: "{{ acctchk.json.data }}"
-  - debug:
-      msg: "{{ tenant_id }}"
 
   - name: Create tenant account
     netapp.storagegrid.na_sg_grid_account:
