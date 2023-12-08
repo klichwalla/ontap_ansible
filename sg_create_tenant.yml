@@ -51,19 +51,6 @@
     with_items: "{{ acctchk.json.data }}"
 
   - name: Create tenant account
-#    netapp.storagegrid.na_sg_grid_account:
-#      api_url: "{{ storagegrid_url }}"
-#      auth_token: "{{ auth.json.data }}"
-#      validate_certs: false
-#      state: present
-#      name: "{{ full_tenant_name }}"
-#      protocol: s3
-#      management: true
-#      use_own_identity_source: false
-#      allow_platform_services: false
-#      password: "{{ tenant_password }}"
-#      root_access_group: "federated-group/Domain Admins"
-##  using REST instead so we can define the description
     ansible.builtin.uri:
       url: "{{ storagegrid_url }}/api/v3/grid/accounts?limit=1000"
       headers:
@@ -87,6 +74,19 @@
     no_log: false
     register: acctnew
     when: acctexist is undefined
+#    netapp.storagegrid.na_sg_grid_account:
+#      api_url: "{{ storagegrid_url }}"
+#      auth_token: "{{ auth.json.data }}"
+#      validate_certs: false
+#      state: present
+#      name: "{{ full_tenant_name }}"
+#      protocol: s3
+#      management: true
+#      use_own_identity_source: false
+#      allow_platform_services: false
+#      password: "{{ tenant_password }}"
+#      root_access_group: "federated-group/Domain Admins"
+##  using REST instead so we can define the description
 
   - name: Get the tenant ID just created
     set_fact:
