@@ -46,7 +46,7 @@
   - name: Check if tenant account already exists
     set_fact: acctexist=true
     set_fact:
-      tenant_id: item.id
+      tenant_id: {{ item.id }}
     when: item.name==full_tenant_name
     with_items: "{{ acctchk.json.data }}"
 
