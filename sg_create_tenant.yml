@@ -76,10 +76,12 @@
     no_log: false
     register: acctnew
     when: acctexist is undefined
+  - debug:
+      msg: "{{ acctnew }}"
 
   - name: Get the tenant ID just created
     set_fact:
-      tenant_id: "{{ acctnew | json_query('resp.id') }}"
+      tenant_id: "{{ acctnew | json_query('data.id') }}"
     when: tenant_id is undefined
   - debug:
       msg: "{{ tenant_id }}"
