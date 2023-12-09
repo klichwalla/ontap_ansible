@@ -81,7 +81,7 @@
 
   - name: Get the tenant ID just created
     set_fact:
-      tenant_id: "{{ acctnew | json_query('data.id') }}"
+      tenant_id: "{{ acctnew.json.data.id' }}"
     when: tenant_id is undefined
   - debug:
       msg: "{{ tenant_id }}"
