@@ -42,14 +42,12 @@
       msg: "Existing tenants: {{ acctchk }}"
   
   - name: Check if tenant account already exists
-    set_fact: 
-      acctexist: true
     set_fact:
       tenant_id: "{{ item.id }}"
     when: item.name == full_tenant_name
     with_items: "{{ acctchk.json.data }}"
   - debug:
-      msg: "check tenant processed, tenant_id: {{ tenant_id }}, acctexist: {{ acctexist }}"
+      msg: "check tenant processed, tenant_id: {{ tenant_id }}"
 
   - name: Create tenant account
     ansible.builtin.uri:
@@ -76,7 +74,7 @@
       validate_certs: false
     no_log: false
     register: acctnew
-    when: acctexist is undefined
+    when: tenant_id is undefined
   - debug:
       msg: "{{ acctnew }}"
 
