@@ -47,7 +47,8 @@
     when: item.name == full_tenant_name
     with_items: "{{ acctchk.json.data }}"
   - debug:
-      msg: "check tenant processed, tenant_id: {{ tenant_id }}"
+      msg: "Existing tenant found, tenant_id: {{ tenant_id }}"
+    when: tenant_id is defined
 
   - name: Create tenant account
     ansible.builtin.uri:
