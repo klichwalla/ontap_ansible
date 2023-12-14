@@ -46,7 +46,7 @@
       acctexist: true
     set_fact:
       tenant_id: "{{ item.id }}"
-    when: item.name == {{ full_tenant_name }}
+    when: item.name == full_tenant_name
     with_items: "{{ acctchk.json.data }}"
   - debug:
       msg: "check tenant processed, tenant_id: {{ tenant_id }}, acctexist: {{ acctexist }}"
