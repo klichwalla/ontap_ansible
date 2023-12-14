@@ -28,8 +28,6 @@
       validate_certs: false
     register: auth
     no_log: false
-  - debug:
-      msg: "{{ auth }}"
   
   - name: Get existing tenant list
     ansible.builtin.uri:
@@ -41,7 +39,7 @@
       validate_certs: false
     register: acctchk
   - debug:
-      msg: "{{ acctchk }}"
+      msg: "Existing tenants: {{ acctchk }}"
   
   - name: Check if tenant account already exists
     set_fact: 
@@ -50,6 +48,8 @@
       tenant_id: "{{ item.id }}"
     when: item.name == {{ full_tenant_name }}
     with_items: "{{ acctchk.json.data }}"
+  - debug:
+      msg: "check tenant processed, tenant_id: {{ tenant_id }}, acctexist: {{ acctexist }}"
 
   - name: Create tenant account
     ansible.builtin.uri:
@@ -85,7 +85,7 @@
       tenant_id: "{{ acctnew.json.data.id }}"
     when: tenant_id is undefined
   - debug:
-      msg: "{{ tenant_id }}"
+      msg: "Created tenant: {{ tenant_id }}"
 
   - name: Authenticate to the tenant ID just created
     ansible.builtin.uri:
@@ -102,8 +102,7 @@
       validate_certs: false
     register: tenant_auth
     no_log: false
-  - debug:
-      msg: "{{ tenant_auth }}"
+
   
   - name: Create the delegated admin group on the tenant
     netapp.storagegrid.na_sg_org_group:
